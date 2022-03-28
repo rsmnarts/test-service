@@ -8,4 +8,6 @@ services:
     ports:
       - 5432:5432
     environment:
+      - POSTGRES_NAME=mydb
+      - POSTGRES_USER=rsmnarts
       - POSTGRES_PASSWORD=rahasia
