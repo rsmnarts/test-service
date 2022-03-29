@@ -11,3 +11,10 @@ services:
       - POSTGRES_NAME=mydb
       - POSTGRES_USER=rsmnarts
       - POSTGRES_PASSWORD=rahasia
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management-alpine
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672

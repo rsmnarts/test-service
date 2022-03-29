@@ -1,9 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import {ForbiddenException, Injectable} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
+import {JwtService} from '@nestjs/jwt';
 import * as argon from 'argon2';
-import { DbService } from 'common/db/db.service';
-import { UserDto } from './dto';
+import {DbService} from 'common/db/db.service';
+import {UserDto} from './dto';
 
 @Injectable()
 export class UserService {
@@ -24,9 +24,7 @@ export class UserService {
       });
 
       delete user.password;
-      return {
-        access_token: await this.signToken(user.id, user.username),
-      };
+      return user;
     } catch (err) {
       if (err.code === 'P2002')
         throw new ForbiddenException('Username already exists');
@@ -37,7 +35,7 @@ export class UserService {
 
   async login(req: UserDto) {
     const user = await this.db.user.findUnique({
-      where: { username: req.username },
+      where: {username: req.username},
     });
 
     if (!user) throw new ForbiddenException('Invalid username or password');
@@ -47,11 +45,14 @@ export class UserService {
       throw new ForbiddenException('Invalid username or password');
 
     delete user.password;
-    return user;
+
+    return {
+      access_token: await this.signToken(user.id, user.username),
+    };
   }
 
   async signToken(userId: number, username: string): Promise<string> {
-    const payload = { sub: userId, username };
+    const payload = {sub: userId, username};
     return this.jwt.signAsync(payload, {
       expiresIn: '1h',
       secret: this.cfg.get('JWT_SECRET'),

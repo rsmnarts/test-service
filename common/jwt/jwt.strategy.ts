@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { DbService } from 'common/db/db.service';
@@ -15,14 +15,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: { sub: number; username: string }) {
-    console.log(
-      'arts ~ file: jwt.strategy.ts ~ line 18 ~ JwtStrategy ~ validate ~ payload',
-      payload,
-    );
-
     const user = await this.db.user.findUnique({
       where: { id: payload.sub },
     });
+
+    if (!user) throw new UnauthorizedException();
 
     delete user.password;
     return user;

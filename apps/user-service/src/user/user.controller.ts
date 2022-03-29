@@ -1,5 +1,15 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { User } from '@prisma/client';
+import { JwtGuard } from 'common/jwt';
+import { GetUser } from './decorator';
 import { UserDto } from './dto';
 import { UserService } from './user.service';
 
@@ -12,14 +22,15 @@ export class UserController {
     return this.userService.register(req);
   }
 
+  @HttpCode(HttpStatus.OK)
   @Post('login')
   login(@Body() req: UserDto) {
     return this.userService.login(req);
   }
 
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtGuard)
   @Get('me')
-  getMe(@Body() req: UserDto) {
-    return req.username;
+  getMe(@GetUser() req: User) {
+    return req;
   }
 }
