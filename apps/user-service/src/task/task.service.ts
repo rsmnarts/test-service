@@ -41,21 +41,24 @@ export class TaskService {
     return this.db.taks.findMany({
       where: {
         ownerId: userId,
+        deletedAt: null,
       },
     });
   }
 
   async getTask(taskId: number, userId: number) {
-    const user = await this.db.taks.findUnique({
+    const user = await this.db.taks.findMany({
       where: {
         id: parseInt(taskId.toString(), 10),
+        deletedAt: null,
       },
+      take: 1,
     });
 
-    if (user?.ownerId !== userId) {
+    if (user[0]?.ownerId !== userId) {
       throw new NotFoundException('Task not found');
     }
 
-    return user;
+    return user[0];
   }
 }

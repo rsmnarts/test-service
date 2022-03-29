@@ -21,9 +21,10 @@ export class TaskServiceService {
   }
 
   async updateTask(data: UpdateTaskEvent) {
-    await this.db.taks.update({
+    await this.db.taks.updateMany({
       where: {
         id: Number(data.id),
+        deletedAt: null,
       },
       data: {
         title: data.title,
@@ -33,9 +34,13 @@ export class TaskServiceService {
   }
 
   async deleteTask(data: DeleteTaskEvent) {
-    await this.db.taks.delete({
+    await this.db.taks.updateMany({
       where: {
         id: Number(data.id),
+        deletedAt: null,
+      },
+      data: {
+        deletedAt: new Date(),
       },
     });
   }
